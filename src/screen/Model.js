@@ -21,14 +21,25 @@ const Model = ({visible, onrequestClose, onPress}) => {
   const textinputValue = useSelector(state => state.textinputValue);
   const [videoTitle, setVideoTitle] = useState('');
   const [discription, setDiscription] = useState('');
+  const [videos, setvideos] = useState(null);
   const [date, setdate] = useState('');
+  const [type, settype] = useState('');
 
   const dispatch = useDispatch();
 
-  const openImagePicker = () => {
-    const options = {
-      mediaType: 'mixed',
-    };
+  const openImagePicker = item => {
+    let options;
+    if (item == 'Videoss') {
+      options = {
+        mediaType: 'video',
+      };
+      settype('video');
+    } else if (item == 'image') {
+      options = {
+        mediaType: 'photo',
+      };
+      settype('photo');
+    }
 
     launchImageLibrary(options, response => {
       if (response.didCancel) {
@@ -38,7 +49,8 @@ const Model = ({visible, onrequestClose, onPress}) => {
       } else {
         let imageUri = response.uri || response.assets?.[0]?.uri;
         setSelectedImage(imageUri);
-        console.log(imageUri);
+        setvideos(imageUri);
+        // console.log(imageUri);
       }
     });
   };
@@ -75,14 +87,18 @@ const Model = ({visible, onrequestClose, onPress}) => {
             <View style={styles.container3}>
               <TouchableOpacity
                 style={styles.toucstyle}
-                onPress={openImagePicker}>
+                onPress={() => {
+                  openImagePicker('image');
+                }}>
                 {selectedImage && <Image source={{uri: selectedImage}} />}
                 <Image source={Images.picture} style={styles.gallery} />
                 <Text style={styles.buttonimage}>Add Image</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.toucstyle}
-                onPress={openImagePicker}>
+                onPress={() => {
+                  openImagePicker('Videoss');
+                }}>
                 {selectedImage && <Image source={{uri: selectedImage}} />}
                 <Image source={Images.video} style={styles.gallery} />
                 <Text style={styles.buttonvideo}>Add Video</Text>
@@ -115,14 +131,19 @@ const Model = ({visible, onrequestClose, onPress}) => {
                         disc: discription,
                         like: 0,
                         imgUri: selectedImage,
+                        videos: videos,
+                        mediaType: type,
+
                         date: moment().utcOffset('+05:30').format(' h:mm a'),
                       },
                     ]),
                   );
                   setSelectedImage(null);
                   setVideoTitle('');
+                  setvideos(null);
                   setDiscription('');
                   onrequestClose(false);
+                  console.log('>>>>>>>>>>>>>>>>>>>', videos);
                 }}>
                 <Text style={styles.postbutton}>POST</Text>
               </TouchableOpacity>

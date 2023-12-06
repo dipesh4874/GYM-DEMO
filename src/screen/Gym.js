@@ -15,14 +15,15 @@ import {Images} from '../helper/Image';
 import Model from './Model';
 import {useDispatch, useSelector} from 'react-redux';
 import {deleteData, updateLike} from '../redux/Action';
+import Videoplayer from 'react-native-video-player';
 
 const Gym = () => {
   const [index1, setIndex1] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
+  const [click, setclick] = useState(true);
   const data = [{name: 'All post'}, {name: 'Photos'}, {name: 'Videos'}];
   const textinput = useSelector(state => state?.user?.textinput);
-
-  const textinputValue = useSelector(state => state.textinputValue);
+  console.log(textinput);
 
   const dispatch = useDispatch();
 
@@ -87,7 +88,25 @@ const Gym = () => {
           renderItem={({item, index}) => (
             <View style={styles.renderview}>
               <Text style={styles.tittle}>{item?.title}</Text>
-              <Image source={{uri: item?.imgUri}} style={styles.flatimg} />
+              {item?.mediaType == 'video' ? (
+                <Videoplayer
+                  video={{uri: item?.videos}}
+                  resizeMode={'cover'}
+                  repeat={true}
+                  endWithThumbnail
+                />
+              ) : (
+                <Image
+                  source={{uri: item?.imgUri}}
+                  style={
+                    item?.imgUri == null
+                      ? {height: 0, width: 0}
+                      : styles.flatimg
+                  }
+                />
+              )}
+
+              <Image source={{uri: item?.videos}} />
               <Text style={styles.discreptic}>{item?.disc}</Text>
               <Text style={styles.date}>{`Posted on ${item.date}`}</Text>
               <View style={styles.toucview}>
